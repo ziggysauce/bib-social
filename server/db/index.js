@@ -131,7 +131,10 @@ const migrate = async () => {
           console.log('Error occurred during migration release: ', err.stack);
         }
       });
-      const [lastExistingMigration] = existingMigrations.pop().split('.sql');
+      const [lastExistingMigration] =
+        existingMigrations &&
+        existingMigrations.length &&
+        existingMigrations.pop().split('.sql');
       console.log(
         `MIGRATIONS COMPLETED [LATEST VERSION: ${
           newestMigration || lastExistingMigration
