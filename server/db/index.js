@@ -85,9 +85,9 @@ const migrate = async () => {
   let existingMigrations = [];
   try {
     const result = await execute('server/sql/migration_queries/get_all.sql');
-    existingMigrations = result.rows.map((r) => r.file_name);
-  } catch {
-    console.log('First migration');
+    existingMigrations = result.rows.map((r) => `${r.id}.sql`);
+  } catch (err) {
+    console.log('RUNNING FIRST MIGRATION', err);
   }
 
   // Get outstanding migrations
@@ -100,23 +100,25 @@ const migrate = async () => {
 
     try {
       // Start transaction
-      await client.query('STARTING MIGRATIONS');
+      console.log('STARTING MIGRATIONS');
       // eslint-disable-next-line no-restricted-syntax
       for (const migration of outstandingMigrations) {
+        const [id] = migration.file.split('.sql');
         await execute(`server/sql/migrations/${migration.file}`);
-        await execute('server/sql/migration_queries/put.sql');
-        await client.query(`COMPLETED MIGRATION ${migration.file}`);
+        await execute('server/sql/migration_queries/put.sql', {id});
+        console.log(`COMPLETED MIGRATION ${migration.file}`);
       }
     } catch (err) {
       console.log('Error occurred while migration process was running: ', err);
-      await client.query('ERROR OCCURRED: ROLLING BACK MIGRATIONS');
+      console.log('ERROR OCCURRED: ROLLING BACK MIGRATIONS');
     } finally {
       release((err) => {
-        console.log('MIGRATIONS COMPLETED');
         if (err) {
           console.log('Error occurred during migration release: ', err.stack);
         }
       });
+      const [lastMigration] = existingMigrations.pop().split('.sql');
+      console.log(`MIGRATIONS COMPLETED [LATEST VERSION: ${lastMigration}]`);
     }
   });
 };

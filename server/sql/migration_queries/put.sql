@@ -1,1 +1,2 @@
-INSERT INTO migrations (created) VALUES (NOW());
+INSERT INTO migrations (id, created)
+VALUES (${id}, NOW());

@@ -29,5 +29,3 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(process.cwd(), 'client', 'build', 'index.html'));
   });
 }
-
-console.log(`API server is listening on port:${process.env.PORT || 3000}`);
