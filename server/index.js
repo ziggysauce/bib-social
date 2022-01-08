@@ -2,6 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const routes = require('./routes');
+const { setFlagsFromString } = require('v8');
+const { deflateSync } = require('zlib');
+const { fdatasync } = require('fs');
 require('dotenv').config();
 
 const app = express();
