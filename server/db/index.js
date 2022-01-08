@@ -9,9 +9,9 @@ dotenv.config();
 const poolConfigs = { connectionString: process.env.DATABASE_URL };
 
 if (process.env.NODE_ENV === 'production') {
-  poolConfigs.ssl = { 
+  poolConfigs.ssl = {
     rejectUnauthorized: false,
-    sslmode: 'require'
+    sslmode: 'require',
   };
 }
 
@@ -28,10 +28,16 @@ const pool = new Pool(poolConfigs);
  * @param {object} res
  * @returns {object} object
  */
-const query = async (text, params) => new Promise((resolve, reject) => {
-    pool.query(text, params)
-      .then((res) => { resolve(res); })
-      .catch((err) => { reject(err); });
+const query = async (text, params) =>
+  new Promise((resolve, reject) => {
+    pool
+      .query(text, params)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 
 /**
@@ -44,7 +50,7 @@ async function execute(path, params = {}) {
   const queryParam = (qv) => {
     const variable = qv.slice(2, -1);
     const i = queryVariables.indexOf(variable);
-    if(i >= 0) {
+    if (i >= 0) {
       return `$${i + 1}`;
     }
     queryVariables.push(variable);
@@ -52,26 +58,29 @@ async function execute(path, params = {}) {
   };
   let sql = fs.readFileSync(path).toString();
   sql = sql.replace(/\$\{[^{}]+\}/g, queryParam);
-  const values = queryVariables ? queryVariables.map(p => params[p]) : [];
+  const values = queryVariables ? queryVariables.map((p) => params[p]) : [];
   return query(sql, values);
-};
+}
 
 /**
  * @description Read all files in current directory, filter out files
  * that don't contain SQL and previously ran migrations.
  * Read content of those files.
- * @param {array} migrations 
+ * @param {array} migrations
  */
 const getOutStandingMigrations = async (migrations = []) => {
   const files = await util.promisify(fs.readdir)('server/sql/migrations');
   const sql = await Promise.all(
     files
-      .filter((file) => file.split('.')[1] === 'sql' && (!migrations.includes(file)))
+      .filter(
+        (file) => file.split('.')[1] === 'sql' && !migrations.includes(file)
+      )
       .map(async (file) => ({
         file,
-        query: await util.promisify(fs.readFile)(`server/sql/migrations/${file}`, {
-          encoding: 'utf-8',
-        }),
+        query: await util.promisify(fs.readFile)(
+          `server/sql/migrations/${file}`,
+          { encoding: 'utf-8' }
+        ),
       }))
   );
   return sql;
@@ -91,12 +100,15 @@ const migrate = async () => {
   }
 
   // Get outstanding migrations
-  const outstandingMigrations = await getOutStandingMigrations(existingMigrations);
+  const outstandingMigrations = await getOutStandingMigrations(
+    existingMigrations
+  );
 
+  // eslint-disable-next-line consistent-return
   await pool.connect(async (error, client, release) => {
     if (error) {
       return console.log('Error connected to db: ', error);
-    };
+    }
     let newestMigration;
 
     try {
@@ -106,7 +118,7 @@ const migrate = async () => {
       for (const migration of outstandingMigrations) {
         const [id] = migration.file.split('.sql');
         await execute(`server/sql/migrations/${migration.file}`);
-        await execute('server/sql/migration_queries/put.sql', {id});
+        await execute('server/sql/migration_queries/put.sql', { id });
         [newestMigration] = migration.file.split('.sql');
         console.log(`COMPLETED MIGRATION ${migration.file}`);
       }
@@ -120,7 +132,11 @@ const migrate = async () => {
         }
       });
       const [lastExistingMigration] = existingMigrations.pop().split('.sql');
-      console.log(`MIGRATIONS COMPLETED [LATEST VERSION: ${newestMigration || lastExistingMigration}]`);
+      console.log(
+        `MIGRATIONS COMPLETED [LATEST VERSION: ${
+          newestMigration || lastExistingMigration
+        }]`
+      );
     }
   });
 };
@@ -128,5 +144,5 @@ const migrate = async () => {
 module.exports = {
   query,
   execute,
-  migrate
+  migrate,
 };
