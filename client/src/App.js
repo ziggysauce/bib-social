@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import logo from './logo.svg';
 import './App.css';
 
@@ -38,9 +39,15 @@ class App extends React.Component {
               <p>
                 This site is under maintenance. Pleae enter the password to continue.
               </p>
-              <input onKeyUp={this.onHandleInputKeyup} type="text" placeholder="Enter the password..." />
-              <button onClick={this.onSubmit} >Submit</button>
-              {error && <p>Sorry that password is incorrect.</p>}
+
+              <div className="input-group mb-3">
+                <input onKeyUp={this.onHandleInputKeyup} type="text" className="form-control" placeholder="Enter the password..." aria-label="Password entry" />
+                <button onClick={this.onSubmit} className="btn btn-primary" type="button">Button</button>
+              </div>
+              <p className={classNames(
+                {'text-danger fst-italic': error},
+                {'opacity-0': !error}
+              )}>Sorry that password is incorrect.</p>
             </div>}
         </header>
       </div>
