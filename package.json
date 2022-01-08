@@ -1,0 +1,19 @@
+{
+  "name": "bib_social",
+  "version": "1.0.0",
+  "description": "Finding Best in Bites with Social Media",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ziggysauce/bib_social.git"
+  },
+  "author": "Dan Nguyen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ziggysauce/bib_social/issues"
+  },
+  "homepage": "https://github.com/ziggysauce/bib_social#readme"
+}
