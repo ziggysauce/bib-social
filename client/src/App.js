@@ -9,11 +9,7 @@ class App extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        Basic create-react-app setup.
-      </div>
-    );
+    return <div>Basic create-react-app setup!</div>;
   }
 }
 
