@@ -97,6 +97,7 @@ const migrate = async () => {
     if (error) {
       return console.log('Error connected to db: ', error);
     };
+    let newestMigration;
 
     try {
       // Start transaction
@@ -106,6 +107,7 @@ const migrate = async () => {
         const [id] = migration.file.split('.sql');
         await execute(`server/sql/migrations/${migration.file}`);
         await execute('server/sql/migration_queries/put.sql', {id});
+        [newestMigration] = migration.file.split('.sql');
         console.log(`COMPLETED MIGRATION ${migration.file}`);
       }
     } catch (err) {
@@ -117,8 +119,8 @@ const migrate = async () => {
           console.log('Error occurred during migration release: ', err.stack);
         }
       });
-      const [lastMigration] = existingMigrations.pop().split('.sql');
-      console.log(`MIGRATIONS COMPLETED [LATEST VERSION: ${lastMigration}]`);
+      const [lastExistingMigration] = existingMigrations.pop().split('.sql');
+      console.log(`MIGRATIONS COMPLETED [LATEST VERSION: ${newestMigration || lastExistingMigration}]`);
     }
   });
 };
