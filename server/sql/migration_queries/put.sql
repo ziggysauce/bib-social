@@ -1,0 +1,1 @@
+INSERT INTO migrations (created) VALUES (NOW());
