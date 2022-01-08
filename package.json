@@ -9,7 +9,7 @@
     "client": "cd client && npm run start",
     "client-install": "cd client && npm i",
     "dev": "concurrently \"npm run start\" \"npm run client\"",
-    "build": "cd client && npm i --legacy-peer-deps && npm run build",
+    "build": "cd client && npm i && npm run build",
     "lint": "eslint \"server/**/*.js\""
   },
   "repository": {
