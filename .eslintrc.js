@@ -21,8 +21,10 @@ module.exports = {
         singleQuote: true,
       },
     ],
-    'max-len': ['error', { code: 120 }],
+    'max-len': ['warn', { code: 120 }],
     curly: ['error', 'all'],
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
   },
   plugins: ['prettier'],
 };
